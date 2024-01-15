@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Issue a New Check</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  
+    <header>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="issue-check.html">Issue Check</a></li>
+          <li><a href="review-checks.html">Review Checks</a></li>
+          <li><a href="ManagementCenter.html">Management Center</a></li>
+        </ul>
+      </nav>
+    </header>
+    <header>
+      <h1>Issue a New Check</h1>
+    </header>
+    <body>
+    <form id="issueCheckForm">
+    <div class="form-group">
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" required />
+    </div>
+    <div class="form-group">
+        <label for="recipients">Recipients:</label>
+        <input type="text" id="recipients" required />
+    </div>
+    <div class="form-group">
+        <label for="contractHash">Contract Hash:</label>
+        <input type="text" id="contractHash" required />
+    </div>
+    <div class="form-group">
+        <label for="expirationDate">Expiration Date:</label>
+        <input type="date" id="expirationDate" required />
+    </div>
+    <!-- Additional inputs if any -->
+    <button type="submit">Create Check</button>
+</form>
+    <script src="app.js"></script>
+  </body>
+</html>
