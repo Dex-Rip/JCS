@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.24;
+// SPDX-License-Identifier: Unlicensed
+pragma solidity 0.8.23;
+
 
 contract JointCheckContract {
     struct Check {
@@ -12,12 +13,13 @@ contract JointCheckContract {
         mapping(address => bool) isSigned;
         bool isAccepted;
         CheckState state;
+        uint256 signedCount; // Count of signed recipients
     }
 
     enum CheckState { Created, Issued, Signed, Accepted, Rejected, Expired }
-
     uint256 private nextCheckId = 1;
     mapping(uint256 => Check) public checks;
+    uint256 public constant MAX_RECIPIENTS = 10;
 
     event CheckIssued(uint256 checkId, address issuer, uint256 amount, bytes32 contractHash, uint256 expirationDate);
     event CheckSigned(uint256 checkId, address recipient);
@@ -26,8 +28,10 @@ contract JointCheckContract {
     event CheckExpired(uint256 checkId);
 
     // Issue a new check
-    function issueCheck(uint256 amount, address[] memory recipients, bytes32 contractHash, uint256 expirationDate) public returns (uint256) {
-        require(recipients.length > 0, "There must be at least one recipient");
+    function issueCheck
+    (uint256 amount, address[] memory recipients, bytes32 contractHash, uint256 expirationDate) 
+    public returns (uint256) {
+        require(recipients.length > 0 && recipients.length <= MAX_RECIPIENTS, "Invalid number of recipients");
         Check storage newCheck = checks[nextCheckId];
         newCheck.amount = amount;
         newCheck.issuer = msg.sender;
@@ -35,8 +39,11 @@ contract JointCheckContract {
         newCheck.contractHash = contractHash;
         newCheck.expirationDate = expirationDate;
         newCheck.state = CheckState.Created;
+        newCheck.signedCount = 0;
 
-        emit CheckIssued(nextCheckId, msg.sender, amount, contractHash, expirationDate);
+        emit 
+        CheckIssued 
+        (nextCheckId, msg.sender, amount, contractHash, expirationDate);
         nextCheckId++;
         return nextCheckId - 1;
     }
@@ -51,7 +58,10 @@ contract JointCheckContract {
 
         check.signatures[msg.sender] = signature;
         check.isSigned[msg.sender] = true;
-        emit CheckSigned(checkId, msg.sender);
+        check.signedCount++;
+        emit 
+        CheckSigned
+        (checkId, msg.sender);
     }
 
     // Recipients reject the check
@@ -61,18 +71,14 @@ contract JointCheckContract {
         require(check.state == CheckState.Issued, "Check is not issued yet");
 
         check.state = CheckState.Rejected;
-        emit CheckRejected(checkId, msg.sender);
+        emit CheckRejected
+        (checkId, msg.sender);
     }
 
     // Check if all recipients have signed the check
     function allRecipientsSigned(uint256 checkId) public view returns (bool) {
         Check storage check = checks[checkId];
-        for(uint i = 0; i < check.recipients.length; i++) {
-            if(!check.isSigned[check.recipients[i]]) {
-                return false;
-            }
-        }
-        return true;
+        return check.signedCount == check.recipients.length;
     }
 
     // Issuer accepts the check
@@ -83,7 +89,8 @@ contract JointCheckContract {
         require(!isExpired(checkId), "Check has expired");
 
         check.state = CheckState.Accepted;
-        emit CheckAccepted(checkId);
+        emit CheckAccepted
+        (checkId);
     }
 
     // Helper function to check if the check is expired
@@ -102,3 +109,5 @@ contract JointCheckContract {
         return false;
     }
 }
+
+

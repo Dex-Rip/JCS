@@ -1,0 +1,6 @@
+{
+    "sqltools.useNodeRuntime": true,
+    "CodeGPT.Autocomplete.enabled": true,
+    "bitoAI.codeCompletion.enableAutoCompletion": true,
+    "bitoAI.codeCompletion.enableCommentToCode": true
+}
